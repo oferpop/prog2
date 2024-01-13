@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask App</title>
+</head>
+<body>
+    <h1>Welcome to Your Flask App</h1>
+    
+    <!-- Login Form -->
+    <h2>Login</h2>
+    <form id="login-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+
+    <!-- Registration Form -->
+    <h2>Register</h2>
+    <form id="register-form">
+        <label for="new-username">Username:</label>
+        <input type="text" id="new-username" name="new-username" required>
+        <br>
+        <label for="new-password">Password:</label>
+        <input type="password" id="new-password" name="new-password" required>
+        <br>
+        <button type="submit">Register</button>
+    </form>
+
+    <!-- Display Protected Content -->
+    <div id="protected-content" style="display: none;">
+        <h2>Protected Content</h2>
+        <p>Welcome, <span id="current-user"></span>! You have access to this protected content.</p>
+    </div>
+
+    <!-- Script to handle form submission and JWT token -->
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Send a POST request to the login route with username and password
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access_token) {
+                    // Store the access token in localStorage for future requests
+                    localStorage.setItem('access_token', data.access_token);
+
+                    // Show protected content
+                    document.getElementById('protected-content').style.display = 'block';
+
+                    // Display the current user
+                    document.getElementById('current-user').textContent = username;
+                } else {
+                    alert(data.msg || 'Login failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('register-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const newUsername = document.getElementById('new-username').value;
+            const newPassword = document.getElementById('new-password').value;
+
+            // Send a POST request to the register route with new username and password
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: newUsername, password: newPassword }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.msg || 'Registration failed');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
